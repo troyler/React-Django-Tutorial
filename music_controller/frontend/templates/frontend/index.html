@@ -1,0 +1,26 @@
+
+
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Music Controller</title>
+    {% load static %}   <!-- loads static folder -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+    />
+    <link rel="stylesheet" type="text/css" href="{% static "css/index.css" %}"
+    />
+  </head>
+  <body>
+    <div id="main">
+      <div id="app"></div>  <!-- this is the div react will take care of, React will grab the app div to display components-->
+    </div>
+
+    <script src="{% static "frontend/main.js" %}"></script>  <!-- access static folder and load bundled JS in main.js-->
+  </body>
+</html>
