@@ -1,4 +1,4 @@
-from .views import RoomView, CreateRoomView, GetRoom, JoinRoom, UserInRoom, LeaveRoom
+from .views import RoomView, CreateRoomView, GetRoom, JoinRoom, UserInRoom, LeaveRoom, UpdateRoom
 from django.urls import path
 
 #points to the location of different /api/... path visits and calls views 
@@ -10,5 +10,6 @@ urlpatterns = [
     path('join-room', JoinRoom.as_view()),
     path('user-in-room', UserInRoom.as_view()),
     path('leave-room', LeaveRoom.as_view()),
+    path('update-room', UpdateRoom.as_view())
 
 ]

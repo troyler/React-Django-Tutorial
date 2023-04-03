@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import {Button, Grid, Typography} from "@material-ui/core";
-import { Link } from "react-router-dom";
+import { Grid, Button, Typography } from "@material-ui/core";
+import CreateRoomPage from "./CreateRoomPage";
 
 export default class Room extends Component {
   constructor(props) {
@@ -9,63 +9,128 @@ export default class Room extends Component {
       votesToSkip: 2,
       guestCanPause: false,
       isHost: false,
+      showSettings: false,
     };
-    this.roomCode = this.props.match.params.roomCode; /// this sets the roomCode, match is the prop that stores all of the information about how we got to the component from react Router
-    this.getRoomDetails()
-    this.leaveButtonPressed = this.leaveButtonPressed.bind(this)
+    this.roomCode = this.props.match.params.roomCode;
+    this.leaveButtonPressed = this.leaveButtonPressed.bind(this);
+    this.updateShowSettings = this.updateShowSettings.bind(this);
+    this.renderSettingsButton = this.renderSettingsButton.bind(this);
+    this.renderSettings = this.renderSettings.bind(this);
+    this.getRoomDetails = this.getRoomDetails.bind(this);
+    this.getRoomDetails();
   }
 
-  getRoomDetails() {                                                           //fetches details with this request, then returns the response in json 
-    fetch('/api/get-room' + '?code=' + this.roomCode)
-    .then((response)=> {  
-      if (!response.ok){  //here we are making sure that the response is ok, otherwise we will have no props to reference
-        this.props.leaveRoomCallback(); //if it is not ok, clear the room on the homepage
-        this.props.history.push("/"); // send back to the homepage 
-      }
-     return response.json();                   //if it is ok...                                 
-    }).then((data) => {                                                       // then it takes this json formatted data and arrow functions to update the states
+  getRoomDetails() {
+    return fetch("/api/get-room" + "?code=" + this.roomCode)
+      .then((response) => {
+        if (!response.ok) {
+          this.props.leaveRoomCallback();
+          this.props.history.push("/");
+        }
+        return response.json();
+      })
+      .then((data) => {
         this.setState({
           votesToSkip: data.votes_to_skip,
           guestCanPause: data.guest_can_pause,
           isHost: data.is_host,
         });
-     });
+      });
   }
-
 
   leaveButtonPressed() {
     const requestOptions = {
       method: "POST",
-      headers: {'Content-Type': 'application/json'},
+      headers: { "Content-Type": "application/json" },
     };
-    fetch('/api/leave-room', requestOptions).then((response)=> {
-      this.props.leaveRoomCallback();   //similar to before, if we leave the page, we need to update the homepage state before returning (otherwise it will send us back here without props)
-      this.props.history.push('/')// sends us back to the homepage 
-
-    })
+    fetch("/api/leave-room", requestOptions).then((_response) => {
+      this.props.leaveRoomCallback();
+      this.props.history.push("/");
+    });
   }
-  
+
+  updateShowSettings(value) {
+    this.setState({
+      showSettings: value,
+    });
+  }
+
+  renderSettings() {
+    return (
+      <Grid container spacing={1}>
+        <Grid item xs={12} align="center">
+          <CreateRoomPage
+            update={true}
+            votesToSkip={this.state.votesToSkip}
+            guestCanPause={this.state.guestCanPause}
+            roomCode={this.roomCode}
+            updateCallback={this.getRoomDetails}
+          />
+        </Grid>
+        <Grid item xs={12} align="center">
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => this.updateShowSettings(false)}
+          >
+            Close
+          </Button>
+        </Grid>
+      </Grid>
+    );
+  }
+
+  renderSettingsButton() {
+    return (
+      <Grid item xs={12} align="center">
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => this.updateShowSettings(true)}
+        >
+          Settings
+        </Button>
+      </Grid>
+    );
+  }
 
   render() {
+    if (this.state.showSettings) {
+      return this.renderSettings();
+    }
     return (
-        <Grid container spacing={1} align = "center" direction = "column">
-          <Grid item xs ={12}>
-            <Typography variant="h4" component= "h4">Code: {this.roomCode}</Typography>
-          </Grid>
-          <Grid item xs ={12}>
-            <Typography variant="h6" component= "h6">Votes to skip: {this.state.votesToSkip}</Typography>
-          </Grid>
-          <Grid item xs ={12}>
-            <Typography variant="h6" component= "h6"> Guest can pause: {String(this.state.guestCanPause)}</Typography>
-          </Grid>
-          <Grid item xs ={12}>
-            <Typography variant="h6" component= "h6">Is host: {String(this.state.isHost)}</Typography>
-          </Grid>
-          <Grid item xs ={12}>
-            <Button variant="contained" color="secondary" onClick= {this.leaveButtonPressed}> 
-            Leave Room</Button>
-          </Grid>
-         </Grid>
+      <Grid container spacing={1}>
+        <Grid item xs={12} align="center">
+          <Typography variant="h4" component="h4">
+            Code: {this.roomCode}
+          </Typography>
+        </Grid>
+        <Grid item xs={12} align="center">
+          <Typography variant="h6" component="h6">
+            Votes: {this.state.votesToSkip}
+          </Typography>
+        </Grid>
+        <Grid item xs={12} align="center">
+          <Typography variant="h6" component="h6">
+            Guest Can Pause: {this.state.guestCanPause.toString()}
+          </Typography>
+        </Grid>
+        <Grid item xs={12} align="center">
+          <Typography variant="h6" component="h6">
+            Host: {this.state.isHost.toString()}
+          </Typography>
+        </Grid>
+        {this.state.isHost ? this.renderSettingsButton() : null}
+        <Grid item xs={12} align="center">
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={this.leaveButtonPressed}
+          >
+            Leave Room
+          </Button>
+        </Grid>
+      </Grid>
     );
   }
 }
