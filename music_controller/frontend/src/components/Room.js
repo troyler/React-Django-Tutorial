@@ -18,11 +18,11 @@ export default class Room extends Component {
   getRoomDetails() {                                                           //fetches details with this request, then returns the response in json 
     fetch('/api/get-room' + '?code=' + this.roomCode)
     .then((response)=> {  
-      if (!response.ok){
-        this.props.leaveRoomCallback();
-        this.props.history.push("/");
+      if (!response.ok){  //here we are making sure that the response is ok, otherwise we will have no props to reference
+        this.props.leaveRoomCallback(); //if it is not ok, clear the room on the homepage
+        this.props.history.push("/"); // send back to the homepage 
       }
-     return response.json();                                                    
+     return response.json();                   //if it is ok...                                 
     }).then((data) => {                                                       // then it takes this json formatted data and arrow functions to update the states
         this.setState({
           votesToSkip: data.votes_to_skip,
@@ -39,7 +39,7 @@ export default class Room extends Component {
       headers: {'Content-Type': 'application/json'},
     };
     fetch('/api/leave-room', requestOptions).then((response)=> {
-      this.props.leaveRoomCallback();
+      this.props.leaveRoomCallback();   //similar to before, if we leave the page, we need to update the homepage state before returning (otherwise it will send us back here without props)
       this.props.history.push('/')// sends us back to the homepage 
 
     })
