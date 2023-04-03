@@ -20,7 +20,7 @@ export default class CreateRoomPage extends Component {
       votesToSkip: this.defaultVotes,
     };
 
-    this.handleRoomButtonPressed = this.handleRoomButtonPressed.bind(this);
+    this.handleRoomButtonPressed = this.handleRoomButtonPressed.bind(this);   //these give the functions below access to the class attributes 
     this.handleVotesChange = this.handleVotesChange.bind(this);
     this.handleGuestCanPauseChange = this.handleGuestCanPauseChange.bind(this);
   }
@@ -48,7 +48,7 @@ export default class CreateRoomPage extends Component {
     };
     fetch("/api/create-room", requestOptions)
       .then((response) => response.json())
-      .then((data) => console.log(data))
+      .then((data) => this.props.history.push('/room/' + data.code));
   }
 
   render() {

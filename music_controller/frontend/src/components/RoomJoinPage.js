@@ -1,11 +1,78 @@
 import React, { Component } from "react";
+import{Button, Grid, Typography, TextField} from "@material-ui/core";
+import { Link } from "react-router-dom";
+
 
 export default class RoomJoinPage extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      roomCode: "",
+      error: false,
+      errString: ""
+    };
+    this.handleTextFieldChange = this.handleTextFieldChange.bind(this)
+    this.roomButtonPressed = this.roomButtonPressed.bind(this)
   }
 
   render() {
-    return <p>This is the room join page</p>;
+    return (
+      <Grid container spacing = {1} align = "center">
+        <Grid item xs={12}>
+          <Typography variant = "h4" component = "h4">Join a Room</Typography> 
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+           error = {this.state.error}
+           label = "Code"
+           placeholder = "Enter a Room Code"
+           value = {this.state.roomCode}
+           helperText = {this.state.error}
+           variant = "outlined"
+           onChange={this.handleTextFieldChange}
+            >
+            </TextField>
+        </Grid>
+        <Grid item xs={12}>
+          <Button variant = "contained" color = "primary" to="/" onClick={this.roomButtonPressed}>
+            Enter a Room
+          </Button> 
+        </Grid>
+        <Grid item xs={12}>
+          <Button variant = "contained" color = "secondary" to="/" component = {Link}>
+            Back
+          </Button>
+        </Grid>
+
+
+
+
+      </Grid>
+    );
   }
+
+ handleTextFieldChange(e) {
+  this.setState({
+    roomCode: e.target.value,
+  });
+ }
+
+  roomButtonPressed(){        // post request sent to api join room endpoint 
+   const requestOptions = {
+    method : 'POST',
+    headers: {"Content-Type" : "application/json"},
+    body: JSON.stringify({
+      code: this.state.roomCode
+    })
+   };
+   fetch('/api/join-room', requestOptions).then((response)=> {   //if response is ok 
+    if (response.ok) {
+      this.props.history.push(`/room/${this.state.roomCode}`)
+    } else {
+      this.setState({error: "Room not found."})
+    }
+   })
+   .catch((error)=> console.log(error))
+  };
+
 }
