@@ -16,10 +16,10 @@ export default class HomePage extends Component {
   }
 
   async componentDidMount() { // this function gets called
-    fetch('api/user-in-room')
-    .then((response) => response.json())
+    fetch('api/user-in-room')  //goes to the api endpoint user-in-room and fetches the session data, which retrieves session data from the user
+    .then((response) => response.json())  
     .then((data) => {
-      this.setState({
+      this.setState({   //use this data to set the session_key to the code, see api/views for implementation
       roomCode: data.code
     });
   });
@@ -59,7 +59,7 @@ export default class HomePage extends Component {
         <Switch>
           <Route exact path="/"      //this is saying to visit the homepage and if 
             render={() => {
-            return this.state.roomCode ? 
+            return this.state.roomCode ? // if state.roomCode has a value 
             (
             <Redirect to= {`/room/${this.state.roomCode}`}/>
             ) : (
@@ -71,10 +71,10 @@ export default class HomePage extends Component {
           <Route path="/create" component={CreateRoomPage} />
           <Route
             path="/room/:roomCode" //colon denotes parameter in the url, React passes some properties to the component by deault
-            render={(props)=>{
-              return <Room {...props} leaveRoomCallback={this.clearRoomCode}></Room>
-            }} 
-           /> 
+            render={(props)=>{  
+              return <Room {...props} leaveRoomCallback={this.clearRoomCode}></Room> //return a room with all the props passed from the route using spread (...) operator
+            }}                                                                        // then we add our own property "leaveRoomCallback", a function to clear the roomCode state
+           />                                                                         
         </Switch>
       </Router>
     );
