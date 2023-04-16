@@ -10,7 +10,7 @@ BASE_URL = "https://api.spotify.com/v1/me/"
 
 def get_user_tokens(session_id):
     user_tokens = SpotifyToken.objects.filter(user=session_id)
-    print(user_tokens)
+
     if user_tokens.exists():
         return user_tokens[0]
     else:
@@ -19,7 +19,7 @@ def get_user_tokens(session_id):
 
 def update_or_create_user_tokens(session_id, access_token, token_type, expires_in, refresh_token):
     tokens = get_user_tokens(session_id)
-    expires_in = timezone.now() + timedelta(seconds = expires_in)
+    expires_in = timezone.now() + timedelta(seconds=expires_in)
 
     if tokens:
         tokens.access_token = access_token
@@ -59,23 +59,36 @@ def refresh_spotify_token(session_id):
     access_token = response.get('access_token')
     token_type = response.get('token_type')
     expires_in = response.get('expires_in')
-    refresh_token = response.get('refresh_token')
 
     update_or_create_user_tokens(
         session_id, access_token, token_type, expires_in, refresh_token)
-    
-def execute_spotify_api_request(session_id, endpoint, post_ = False, put_ = False):
-    tokens = get_user_tokens(session_id)
-    headers = {'Content-Type': 'application/json', 'Authorization' : "Bearer " + tokens.access_token}
 
-    if post_:
-        post(BASE_URL + endpoint, headers = headers)
 
-    if put_:
-        post(BASE_URL + endpoint, headers = headers)
+def execute_spotify_api_request(session_id, endpoint, post_=False, put_=False):   #takes session_id (host token here), endpoints, request type
+    tokens = get_user_tokens(session_id)   #set the tokens from the session_id
+    headers = {'Content-Type': 'application/json',    #some stuff for spotify
+               'Authorization': "Bearer " + tokens.access_token}   #Bearer must have space following it
 
-    response = get(BASE_URL + endpoint, {}, headers=headers)
+    if post_:    #if we set post to be true, sends post request 
+        post(BASE_URL + endpoint, headers=headers)
+    if put_:      #if we set put to be true, same deal
+        put(BASE_URL + endpoint, headers=headers)
+
+    response = get(BASE_URL + endpoint, {}, headers=headers)  #if we did not set either to be true,we assume a get request
+    #{} is what we are sending with the request, excpet here we just send nothing for syntax 
     try:
-        return response.json()
+        return response.json()  #attempt to return the response of the response 
     except:
-        return {"Error" : "Issue with request"}
+        return {'Error': 'Issue with request'}
+    
+# did not include try, except block for the other requests because we do not care about their responses 
+
+def play_song(session_id):
+    print("song playing")
+    return execute_spotify_api_request(session_id, "player/play", put_ = True)
+
+
+
+def pause_song(session_id):
+    print("song paused")
+    return execute_spotify_api_request(session_id, "player/pause", put_ = True)

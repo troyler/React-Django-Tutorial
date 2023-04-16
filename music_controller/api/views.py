@@ -85,7 +85,7 @@ class UserInRoom(APIView):
         if not self.request.session.exists(self.request.session.session_key):
             self.request.session.create()     
         data = {
-            'code': self.request.session.get('room_code')  #getting the code info deom the session 
+            'code': self.request.session.get('room_code')  #getting the code info from the session 
         }
         return JsonResponse(data, status = status.HTTP_200_OK)
     
